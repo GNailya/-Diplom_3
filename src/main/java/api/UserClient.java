@@ -1,35 +1,43 @@
 package api;
+
+import io.qameta.allure.Step;
 import io.restassured.response.Response;
 import model.User;
 import model.UserCredentials;
 
 import static io.restassured.RestAssured.given;
 
-public class UserClient extends RestAssuredClient{
-    public static Response registrationUser(User user) {
-        return given()
+public class UserClient extends RestAssuredClient {
+    private final String LOGIN = "login/";
+    private final String REGISTER = "register/";
+    private final String DELETE = "auth/user/";
+
+    public Response registrationUser(User user) {
+        return (Response) given()
                 .spec(getSpec())
                 .body(user)
                 .when()
-                .post(ROOT + "register/");
+                .post(REGISTER);
 
     }
 
-    public static Response login(UserCredentials creds) {
-        return given()
+    public Response login(UserCredentials creds) {
+        return (Response) given()
                 .spec(getSpec())
                 .body(creds)
                 .when()
-                .post(ROOT + "login/");
+                .post(LOGIN);
 
     }
 
-    public static Response delete(Response response) {
+    @Step("Удаление пользователя")
+    public Response delete(Response response) {
         String accessToken = response.body().jsonPath().getString("accessToken");
         return given()
                 .spec(getSpec())
                 .header("Authorization", accessToken)
                 .when()
-                .delete(ROOT + "user");
+                .delete(DELETE);
+
     }
 }

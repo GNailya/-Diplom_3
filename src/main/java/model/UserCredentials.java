@@ -1,8 +1,8 @@
 package model;
 
 public class UserCredentials {
-    public String email;
-    public String password;
+    private String email;
+    private String password;
 
     public UserCredentials(String email, String password) {
         this.email = email;
@@ -24,4 +24,5 @@ public class UserCredentials {
     public void setPassword(String password) {
         this.password = password;
     }
+
 }

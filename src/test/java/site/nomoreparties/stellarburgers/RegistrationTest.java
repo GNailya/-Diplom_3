@@ -13,30 +13,37 @@ import org.junit.Test;
 
 import static com.codeborne.selenide.Selenide.open;
 import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
+import static model.User.getRandomUser;
 import static org.junit.Assert.assertTrue;
 
 public class RegistrationTest {
     private User user;
+    private UserClient userClient;
+
     @Before
     public void setUp() {
-        user = User.getRandomUser();
+        user = getRandomUser();
+        userClient = new UserClient();
+
+        //Configuration.browser = "firefox";
     }
 
     @After
     public void tearDown() {
         getWebDriver().quit();
-        UserCredentials userCredentials = new UserCredentials(user.getEmail(), user.getPassword());
-        Response response = UserClient.login(userCredentials);
-        if (response.body().jsonPath().getString("accessToken") != null) {
-            UserClient.delete(response);
-        }
 
+        UserCredentials userCredentials = new UserCredentials(user.getEmail(), user.getPassword());
+        Response response = userClient.login(userCredentials);
+        if (response.body().jsonPath().getString("accessToken") != null) {
+            userClient.delete(response);
+        }
     }
+
 
     @Test
     @DisplayName("Создание пользователя с валидными данными")
     @Description("После успешной регистрации открывается страница авторизации")
-    public void succesRegistrationTest(){
+    public void succesRegistrationTest() {
 
         boolean isUrlLoginPage = open(RegistrationPage.URL_REGISTER, RegistrationPage.class)
                 .setName(user.getName())
@@ -45,11 +52,11 @@ public class RegistrationTest {
                 .clickBtnRegister()
                 .isUrlLoginPage();
 
-        assertTrue( isUrlLoginPage);
-
+        assertTrue(isUrlLoginPage);
 
 
     }
+
     @Test
     @DisplayName("Создание пользователя с некорректным паролем")
     @Description("Регистрация не происходит при введении некорректного пароля, возвращается ошибка")

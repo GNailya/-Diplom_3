@@ -11,24 +11,31 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static com.codeborne.selenide.Selenide.open;
+import static model.User.getRandomUser;
 import static org.junit.Assert.assertTrue;
 
 public class LogoutTest {
-    User user;
+    private User user;
+    private UserClient userClient;
 
     @Before
     public void setUp() {
-        user = User.getRandomUser();
-        UserClient.registrationUser(user);
+        user = getRandomUser();
+        userClient = new UserClient();
+        userClient.registrationUser(user);
+
+        //Configuration.browser = "firefox";
     }
+
     @After
     public void tearDown() {
 
-        UserCredentials userCredentials = new UserCredentials(user.getEmail(), user.getPassword());
-        Response response = UserClient.login(userCredentials);
+       UserCredentials userCredentials = new UserCredentials(user.getEmail(), user.getPassword());
+        Response response = userClient.login(userCredentials);
         if (response.body().jsonPath().getString("accessToken") != null) {
-            UserClient.delete(response);
+            userClient.delete(response);
         }
+
     }
     @Test
     @DisplayName("Выход из личного кабинета")

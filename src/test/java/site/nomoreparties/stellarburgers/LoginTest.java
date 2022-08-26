@@ -12,26 +12,36 @@ import org.junit.Test;
 
 import static com.codeborne.selenide.Selenide.open;
 import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
+import static model.User.getRandomUser;
 import static org.junit.Assert.assertTrue;
 
 public class LoginTest {
-    User user;
+    private User user;
+    private UserClient userClient;
+
+
 
     @Before
     public void setUp() {
-        user = User.getRandomUser();
-        UserClient.registrationUser(user);
+        user = getRandomUser();
+        userClient = new UserClient();
+        userClient.registrationUser(user);
+
+        //Configuration.browser = "firefox";
     }
+
     @After
     public void tearDown() {
         getWebDriver().quit();
+
         UserCredentials userCredentials = new UserCredentials(user.getEmail(), user.getPassword());
-        Response response = UserClient.login(userCredentials);
+        Response response = userClient.login(userCredentials);
         if (response.body().jsonPath().getString("accessToken") != null) {
-            UserClient.delete(response);
+            userClient.delete(response);
         }
 
     }
+
     @Test
     @DisplayName("Вход по кнопке «Войти в аккаунт» на главной")
     @Description("После успешной авторизации пользователя редиректит на главную страницу")
@@ -43,8 +53,9 @@ public class LoginTest {
                 .clickBtnLogin()
                 .isUrlMainPage();
 
-        assertTrue( isUrlMainPage);
+        assertTrue(isUrlMainPage);
     }
+
     @Test
     @DisplayName("Вход через кнопку «Личный кабинет»")
     @Description("После успешной авторизации пользователя редиректит на главную страницу")
@@ -56,10 +67,11 @@ public class LoginTest {
                 .clickBtnLogin()
                 .isUrlMainPage();
 
-        assertTrue( isUrlMainPage);
+        assertTrue(isUrlMainPage);
 
 
     }
+
     @Test
     @DisplayName("Вход через кнопку в форме регистрации")
     @Description("После успешной авторизации пользователя редиректит на главную страницу")
@@ -73,6 +85,7 @@ public class LoginTest {
 
         assertTrue(isUrlMainPage);
     }
+
     @Test
     @DisplayName("Вход через кнопку в форме восстановления пароля")
     @Description("После успешной авторизации пользователя редиректит на главную страницу")

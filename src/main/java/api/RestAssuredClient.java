@@ -6,11 +6,12 @@ import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 
 public class RestAssuredClient {
-    public static String ROOT = "https://stellarburgers.nomoreparties.site/api/auth/";
+
     public static RequestSpecification getSpec() {
         return new RequestSpecBuilder()
                 .log(LogDetail.ALL)
                 .setContentType(ContentType.JSON)
+                .setBaseUri("https://stellarburgers.nomoreparties.site/api/auth/")
                 .build();
     }
 }

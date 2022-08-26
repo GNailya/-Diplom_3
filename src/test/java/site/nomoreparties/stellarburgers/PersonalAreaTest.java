@@ -12,29 +12,37 @@ import org.junit.Test;
 
 import static com.codeborne.selenide.Selenide.open;
 import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
+import static model.User.getRandomUser;
 import static org.junit.Assert.assertTrue;
 import static site.nomoreparties.stellarburgers.LoginPage.URL_LOGIN;
 import static site.nomoreparties.stellarburgers.MainPage.URL_MAIN;
 
 public class PersonalAreaTest {
     private User user;
-    UserClient userClient;
+    private UserClient userClient;
+
 
     @Before
     public void setUp() {
-        user = User.getRandomUser();
-        UserClient.registrationUser(user);
+        user = getRandomUser();
+        userClient = new UserClient();
+        userClient.registrationUser(user);
+
+        //Configuration.browser = "firefox";
     }
 
     @After
     public void tearDown() {
         getWebDriver().quit();
+
         UserCredentials userCredentials = new UserCredentials(user.getEmail(), user.getPassword());
-        Response response = UserClient.login(userCredentials);
+        Response response = userClient.login(userCredentials);
         if (response.body().jsonPath().getString("accessToken") != null) {
-            UserClient.delete(response);
+            userClient.delete(response);
         }
+
     }
+
     @Test
     @DisplayName("Переход в личный кабинет авторизованным пользователем -> открывается личный кабинет")
     @Description("При клике на Личный кабинет,авторизованного пользователя редиректит на страницу Профиль")
@@ -48,8 +56,8 @@ public class PersonalAreaTest {
 
         assertTrue(isUrlProfilePage);
 
-
     }
+
     @Test
     @DisplayName("Переход в личный кабинет неавторизованным пользователем")
     @Description("При клике на Личный кабинет, неавторизованного пользователя редиректит на страницу авторизации")
@@ -60,6 +68,7 @@ public class PersonalAreaTest {
 
         assertTrue(isUrlLoginPage);
     }
+
     @Test
     @DisplayName("Переход из личного кабинета в конструктор  -> открывается главная страница")
     public void goFromProfilePageToConstructorTest() {
@@ -73,6 +82,7 @@ public class PersonalAreaTest {
 
         assertTrue(isUrlMainPage);
     }
+
     @Test
     @DisplayName("Переход из личного кабинета на логотип Stellar Burgers -> открывается главная страница")
     public void goFromProfilePageToLogoTest() {
